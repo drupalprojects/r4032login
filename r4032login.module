@@ -73,7 +73,7 @@ function r4032login_theme() {
  * and a query string parameter appended to the url to return after login.
  */
 function r4032login_redirect() {
-  global $user;
+  global $user, $language;
   if ($user->uid == 0) {
     if (variable_get('r4032login_display_denied_message', 'Access denied. You must login to view this page.')) {
       drupal_set_message(variable_get('r4032login_display_denied_message', 'Access denied. You must login to view this page.'), 'error');
@@ -82,8 +82,11 @@ function r4032login_redirect() {
     if (empty($_REQUEST['q'])) {
       $_REQUEST['q'] = '<front>';
     }
+    // Check for path prefix and strip it out if its found.
+    $prefix = $language->language .'/';
+    $path = str_replace($prefix, '', drupal_urlencode($_REQUEST['q']));
     // using drupal_goto() with destination set causes a recursive redirect loop
-    header('Location: '. url('user/login', array('query' => 'destination='. drupal_urlencode($_REQUEST['q']), 'absolute' => TRUE)), TRUE, 302);
+    header('Location: '. url('user/login', array('query' => 'destination='. $path, 'absolute' => TRUE)), TRUE, 302);
     exit;
   }
   // checking arg() returns r4032login
