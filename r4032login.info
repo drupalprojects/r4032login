@@ -1,3 +1,2 @@
-; $Id$
 name = Redirect 403 to User Login
 description = Redirect anonymous users from 403 Access Denied pages to the /user/login page.
