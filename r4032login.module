@@ -47,6 +47,12 @@ function r4032login_admin_settings() {
     '#description' => t('The message to display when a logged-in user tries to register another account through the !new_account. Drupal does not allow it, so regular users must log out first. Administrators should create new users in !link.', array('!new_account' => l(t('new account registration form'), 'user/register'), '!link' => l(t('User management'), 'admin/user/user/create'))),
     '#default_value' => variable_get('r4032login_user_register_message', t('You are not authorized to access this page.'))
   );
+  $form['r4032login_redirect_authenticated_users_to'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Rediect authenticated users to'),
+    '#description' => t('If an authenticated user tries to access a page they can not, redirect them to the given page. Use &lt;front&gt; for the front page, leave blank for the default access denied page.'),
+    '#default_value' => variable_get('r4032login_redirect_authenticated_users_to', ''),
+  );
   return system_settings_form($form);
 }
 
@@ -73,6 +79,7 @@ function r4032login_theme() {
  */
 function r4032login_redirect() {
   global $user;
+  $redirect = variable_get('r4032login_redirect_authenticated_users_to', '');
   if (user_is_anonymous()) {
     if (variable_get('r4032login_display_denied_message', 'Access denied. You must login to view this page.')) {
       drupal_set_message(variable_get('r4032login_display_denied_message', 'Access denied. You must login to view this page.'), 'error');
@@ -85,6 +92,10 @@ function r4032login_redirect() {
     $path = _r4032login_remove_language(drupal_urlencode($_REQUEST['q']));
     // using drupal_goto() with destination set causes a recursive redirect loop
     header('Location: '. url('user/login', array('query' => 'destination='. $path, 'absolute' => TRUE)), TRUE, 302);
+    exit;
+  }
+  elseif (!empty($redirect)) {
+    header('Location: '. url($redirect));
     exit;
   }
   // checking arg() returns r4032login
