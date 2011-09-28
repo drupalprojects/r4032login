@@ -84,12 +84,8 @@ function r4032login_redirect() {
     if (variable_get('r4032login_display_denied_message', 'Access denied. You must login to view this page.')) {
       drupal_set_message(variable_get('r4032login_display_denied_message', 'Access denied. You must login to view this page.'), 'error');
     }
-    // A special case for the homepage.
-    if (empty($_REQUEST['q'])) {
-      $_REQUEST['q'] = '<front>';
-    }
     // Check for path prefix and strip it out if its found.
-    $path = _r4032login_remove_language(drupal_urlencode($_REQUEST['q']));
+    $path = _r4032login_remove_language(request_uri());
     // using drupal_goto() with destination set causes a recursive redirect loop
     header('Location: '. url('user/login', array('query' => 'destination='. $path, 'absolute' => TRUE)), TRUE, 302);
     exit;
