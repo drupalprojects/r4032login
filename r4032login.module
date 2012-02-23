@@ -90,20 +90,18 @@ function r4032login_redirect() {
     $path = _r4032login_remove_language(request_uri());
     // using drupal_goto() with destination set causes a recursive redirect loop
     header('Location: '. url('user/login', array('query' => 'destination='. $path, 'absolute' => TRUE)), TRUE, 302);
-    exit;
+    drupal_exit();
   }
   elseif (!empty($redirect)) {
     header('Location: '. url($redirect));
-    exit;
+    drupal_exit();
   }
   // checking arg() returns r4032login
   elseif ($_REQUEST['q'] == 'user/register') {
-    print theme('page', theme('r4032login_user_register'));
-    exit;
+    return theme('r4032login_user_register');
   }
   else {
-    print theme('page', theme('r4032login_denied'));
-    exit;
+    return theme('r4032login_denied');
   }
 }
 
