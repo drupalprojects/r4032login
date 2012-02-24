@@ -88,11 +88,11 @@ function r4032login_redirect() {
     }
     // Check for path prefix and strip it out if its found.
     // using drupal_goto() with destination set causes a recursive redirect loop
-    header('Location: '. url('user/login', array('query' => _r4032login_destination(), 'absolute' => TRUE)), TRUE, 302);
+    header('Location: ' . url('user/login', array('query' => _r4032login_destination(), 'absolute' => TRUE)), TRUE, 302);
     drupal_exit();
   }
   elseif (!empty($redirect)) {
-    header('Location: '. url($redirect));
+    header('Location: ' . url($redirect));
     drupal_exit();
   }
   // checking arg() returns r4032login
@@ -125,7 +125,7 @@ function _r4032login_destination() {
     $queryarray = explode('&', $destination['query']);
     $path = str_replace('q=', '', $queryarray[0]);
     unset($queryarray[0]);
-    $query = !empty($queryarray) ? '?'. implode('&', $queryarray) : '';
+    $query = !empty($queryarray) ? '?' . implode('&', $queryarray) : '';
     $destination = $path . $query;
   }
 
@@ -150,11 +150,11 @@ function _r4032login_destination() {
 
 function theme_r4032login_denied() {
   drupal_set_title(t('Access denied'));
-  return '<p>'. t('You are not authorized to access this page.') .'</p>';
+  return '<p>' . t('You are not authorized to access this page.') . '</p>';
 }
 
 function theme_r4032login_user_register() {
   drupal_set_title(t('Access denied'));
   $message = variable_get('r4032login_user_register_message', 'You are not authorized to access this page.');
-  return '<p>'. t($message) .'</p>';
+  return '<p>' . t($message) . '</p>';
 }
