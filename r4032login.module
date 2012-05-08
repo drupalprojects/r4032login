@@ -96,11 +96,11 @@ function r4032login_redirect() {
     // using drupal_goto() with destination set causes a recursive redirect loop
     $login_path = variable_get('r4032login_user_login_path', 'user/login');
     header('Location: ' . url($login_path, array('query' => _r4032login_destination(), 'absolute' => TRUE)), TRUE, 302);
-    drupal_exit();
+    _r4032login_exit();
   }
   elseif (!empty($redirect)) {
     header('Location: ' . url($redirect));
-    drupal_exit();
+    _r4032login_exit();
   }
   // checking arg() returns r4032login
   elseif ($_REQUEST['q'] == 'user/register') {
@@ -164,4 +164,22 @@ function theme_r4032login_user_register() {
   drupal_set_title(t('Access denied'));
   $message = variable_get('r4032login_user_register_message', 'You are not authorized to access this page.');
   return '<p>' . t($message) . '</p>';
+}
+
+/**
+ * Performs end-of-request tasks.
+ *
+ * Code borrowed from drupal_goto() because drupal_exit() doesn't exist in 6.x.
+ */
+
+function _r4032login_exit() {
+  // Allow modules to react to the end of the page request before redirecting.
+  // We do not want this while running update.php.
+  if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
+    module_invoke_all('exit', $url);
+  }
+
+  // Even though session_write_close() is registered as a shutdown function, we
+  // need all session data written to the database before redirecting.
+  session_write_close();
 }
