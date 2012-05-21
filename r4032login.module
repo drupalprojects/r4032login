@@ -39,13 +39,13 @@ function r4032login_admin_settings() {
   $form['r4032login_display_denied_message'] = array(
     '#type' => 'textarea',
     '#title' => t('Display access denied message on login page'),
-    '#default_value' => variable_get('r4032login_display_denied_message', 'Access denied. You must login to view this page.')
+    '#default_value' => variable_get('r4032login_display_denied_message', t('Access denied. You must login to view this page.')),
   );
   $form['r4032login_user_register_message'] = array(
     '#type' => 'textfield',
     '#title' => t('User register message'),
     '#description' => t('The message to display when a logged-in user tries to register another account through the !new_account. Drupal does not allow it, so regular users must log out first. Administrators should create new users in !link.', array('!new_account' => l(t('new account registration form'), 'user/register'), '!link' => l(t('User management'), 'admin/user/user/create'))),
-    '#default_value' => variable_get('r4032login_user_register_message', t('You are not authorized to access this page.'))
+    '#default_value' => variable_get('r4032login_user_register_message', t('You are not authorized to access this page.')),
   );
   $form['r4032login_redirect_authenticated_users_to'] = array(
     '#type' => 'textfield',
@@ -88,7 +88,7 @@ function r4032login_redirect() {
   $redirect = variable_get('r4032login_redirect_authenticated_users_to', '');
   if (user_is_anonymous()) {
     // Only display the message if there is one.
-    $message = variable_get('r4032login_display_denied_message', 'Access denied. You must login to view this page.');
+    $message = variable_get('r4032login_display_denied_message', t('Access denied. You must login to view this page.'));
     if (!empty($message)) {
       drupal_set_message(t($message), 'error');
     }
@@ -162,7 +162,7 @@ function theme_r4032login_denied() {
 
 function theme_r4032login_user_register() {
   drupal_set_title(t('Access denied'));
-  $message = variable_get('r4032login_user_register_message', 'You are not authorized to access this page.');
+  $message = variable_get('r4032login_user_register_message', t('You are not authorized to access this page.'));
   return '<p>' . t($message) . '</p>';
 }
 
