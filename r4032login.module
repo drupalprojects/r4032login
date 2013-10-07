@@ -95,7 +95,7 @@ function r4032login_redirect() {
     // Check for path prefix and strip it out if its found.
     // using drupal_goto() with destination set causes a recursive redirect loop
     $login_path = variable_get('r4032login_user_login_path', 'user/login');
-    header('Location: ' . url($login_path, array('query' => _r4032login_destination(), 'absolute' => TRUE)), TRUE, 302);
+    header('Location: ' . url($login_path, array('query' => _r4032login_destination(), 'absolute' => TRUE)), TRUE, 301);
     _r4032login_exit();
   }
   elseif (!empty($redirect)) {
@@ -123,7 +123,7 @@ function _r4032login_destination() {
   global $base_path;
   if (strpos($destination, $base_path) === 0) {
     $destination = substr($destination, strlen($base_path));
-  }  
+  }
 
   if (!variable_get('clean_url', 0)) {
     // Clean URLs disabled, so break apart the query string and
