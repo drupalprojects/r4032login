@@ -172,7 +172,7 @@ function theme_r4032login_user_register() {
  * Code borrowed from drupal_goto() because drupal_exit() doesn't exist in 6.x.
  */
 
-function _r4032login_exit() {
+function _r4032login_exit($url = NULL) {
   // Allow modules to react to the end of the page request before redirecting.
   // We do not want this while running update.php.
   if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
