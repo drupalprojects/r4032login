@@ -157,43 +157,14 @@ function r4032login_redirect() {
  *
  */
 function _r4032login_destination() {
-  // decode URL to prevent double-encoding https://drupal.org/node/1403616
-  $destination = urldecode(request_uri());
-
-  // Remove basepath
-  global $base_path;
-  if (strpos($destination, $base_path) === 0) {
-    $destination = substr($destination, strlen($base_path));
+  // When on an access denied page, Drupal stores the original path in
+  // $_REQUEST['destination'] in drupal_access_denied().
+  $path = isset($_REQUEST['destination']) ? $_REQUEST['destination'] : '';
+  $query = drupal_query_string_encode($_GET, array('q'));
+  if ($query != '') {
+    $path .= '?' . $query;
   }
-
-  if (!variable_get('clean_url', 0)) {
-    // Clean URLs disabled, so break apart the query string and
-    // pull out the path.
-    $destination = parse_url($destination);
-    $queryarray = explode('&', $destination['query']);
-    $path = str_replace('q=', '', $queryarray[0]);
-    unset($queryarray[0]);
-    $query = !empty($queryarray) ? '?' . implode('&', $queryarray) : '';
-    $destination = $path . $query;
-  }
-
-  // If the language path prefixing is enabled remove it from the path.
-  if (variable_get('language_negotiation', FALSE)) {
-    $args = explode('/', $destination);
-    $prefix = array_shift($args);
-
-    // Search prefix within enabled languages.
-    $languages = language_list('enabled');
-    foreach ($languages[1] as $language) {
-      if (!empty($language->prefix) && $language->prefix == $prefix) {
-        // Found a match, rebuild the path without the language.
-        $destination = implode('/', $args);
-        break;
-      }
-    }
-  }
-
-  return 'destination=' . urlencode($destination);
+  return 'destination=' . urlencode($path);
 }
 
 function theme_r4032login_denied() {
