@@ -62,28 +62,21 @@ function r4032login_admin_settings() {
   $options = array('301' => '301 Moved Permanently', '302' => '302 Found');
   $form['r4032login_default_redirect_code'] = array(
     '#type' => 'select',
-    '#title' => t("HTTP default redirect code"),
-    '#description' => t('The redirect code to send by default. 301 responses may be cached by browsers and proxies.'),
+    '#title' => t("HTTP redirect code"),
+    '#description' => t('The redirect code to send. 301 responses may be cached by browsers and proxies, so 302 is normally the correct choice.'),
     '#options' => $options,
     '#default_value' => variable_get('r4032login_default_redirect_code', 302),
   );
   $form['matching_paths'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Redirect code for matching pages'),
+    '#title' => t('Skip redirect for matching pages'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  $form['matching_paths']['r4032login_match_redirect_code'] = array(
-    '#type' => 'select',
-    '#title' => t("HTTP redirect code to use for matching pages"),
-    '#description' => t('The redirect code to send for paths that match. 301 responses may be cached by browsers and proxies.'),
-    '#options' => $options,
-    '#default_value' => variable_get('r4032login_match_redirect_code', 301),
-  );
-  $form['matching_paths']['r4032login_match_redirect_pages'] = array(
+  $form['matching_paths']['r4032login_match_noredirect_pages'] = array(
     '#type' => 'textarea',
-    '#default_value' => variable_get('r4032login_match_redirect_pages', ''),
-    '#description' => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", array('%blog' => 'blog', '%blog-wildcard' => 'blog/*', '%front' => '<front>')),
+    '#default_value' => variable_get('r4032login_match_noredirect_pages', ''),
+    '#description' => t('Instead of redirecting, the user will get an access deined response and see the standard login form. This may be useful when the response code is important - such as for removing outdated content from search engines.  Use the path node/* for all content.') . ' ' . t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", array('%blog' => 'blog', '%blog-wildcard' => 'blog/*', '%front' => '<front>')),
   );
   return system_settings_form($form);
 }
@@ -115,12 +108,9 @@ function r4032login_redirect() {
   if (user_is_anonymous()) {
     // Only display the message if there is one.
     $message = variable_get('r4032login_display_denied_message', t('Access denied. You must login to view this page.'));
-    if (!empty($message)) {
+    if (!empty($message) && empty($_POST)) {
       drupal_set_message($message, 'error');
     }
-    // Check for path prefix and strip it out if its found.
-    // using drupal_goto() with destination set causes a recursive redirect loop
-    $login_path = variable_get('r4032login_user_login_path', 'user/login');
     $page_match = FALSE;
     $pages = variable_get('r4032login_match_redirect_pages', '');
     if ($pages) {
@@ -135,7 +125,14 @@ function r4032login_redirect() {
       }
 
     }
-    $code = $page_match ? variable_get('r4032login_match_redirect_code', 301) : variable_get('r4032login_default_redirect_code', 302);
+    if ($page_match) {
+      // Display the default login page.
+      return drupal_get_form('user_login');
+    }
+    // Handle redirection to the login form.
+    // using drupal_goto() with destination set causes a recursive redirect loop
+    $login_path = variable_get('r4032login_user_login_path', 'user/login');
+    $code = variable_get('r4032login_default_redirect_code', 302);
     header('Location: ' . url($login_path, array('query' => _r4032login_destination(), 'absolute' => TRUE)), TRUE, $code);
     _r4032login_exit();
   }
